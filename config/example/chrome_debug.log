@@ -1,0 +1,21 @@
+[85634:85634:1008/110743.691497:WARNING:chrome_main_delegate.cc(742)] This is Chrome version 126.0.6478.182 (not a warning)
+[85634:85634:1008/110743.848492:INFO:chrome_browser_cloud_management_controller.cc(196)] No machine level policy manager exists.
+[85634:85656:1008/110743.870770:WARNING:external_pref_loader.cc(294)] You are using an old-style extension deployment method (external_extensions.json), which will soon be deprecated. (see http://developer.chrome.com/docs/extensions/how-to/distribute/install-extensions)
+[85675:85675:1008/110743.901405:WARNING:sandbox_linux.cc(430)] InitializeSandbox() called with multiple threads in process gpu-process.
+[85634:85634:1008/110743.931702:WARNING:browser_management_service.cc(128)] EnterpriseLogoUrl fetch failed with error code -1 and MIME type 
+[85634:85634:1008/110743.955824:WARNING:bluez_dbus_manager.cc(248)] Floss manager not present, cannot set Floss enable/disable.
+[85634:85634:1008/110744.113090:ERROR:object_proxy.cc(576)] Failed to call method: org.freedesktop.ScreenSaver.GetActive: object_path= /org/freedesktop/ScreenSaver: org.freedesktop.DBus.Error.NotSupported: This method is not implemented
+[85634:85634:1008/110744.165317:INFO:CONSOLE(1)] "%s [33m%s [0.007] [SW] init", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110744.167664:INFO:CONSOLE(1)] "%s [33m%s [0.010] [SW] got 0 windows from the start", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110744.249416:INFO:CONSOLE(1)] "%s [33m%s [0.092] [SW] window connected 9fc2240e-74d3-4425-b37d-9e49e85f2e1a windows before 0", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110744.249531:INFO:CONSOLE(1)] "%s [33m%s [0.092] [SW] windows ", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110744.249552:INFO:CONSOLE(1)] "%s [33m%s [0.092] [SW] sending message port for mtproto", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110744.249780:INFO:CONSOLE(2)] "Supported image mime types [object Set]", source: https://web.telegram.org/k/index-e-jlGVAF.js (2)
+[85634:85634:1008/110744.286365:INFO:CONSOLE(2)] "got state, time: 40.399999998509884", source: https://web.telegram.org/k/index-e-jlGVAF.js (2)
+[85634:85634:1008/110744.286469:INFO:CONSOLE(2)] "Will mount auth page: authStateSignQr 1728360464.285", source: https://web.telegram.org/k/index-e-jlGVAF.js (2)
+[85634:85634:1008/110751.626395:INFO:CONSOLE(1)] "%s [33m%s [7.468] [SW] something has disconnected [object WindowClient]", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110751.626997:INFO:CONSOLE(1)] "%s [33m%s [7.468] [SW] window disconnected, left 0", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110751.627032:INFO:CONSOLE(1)] "%s [33m%s [7.468] [SW] no windows left", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110751.627049:INFO:CONSOLE(1)] "%s [33m%s [7.468] [SW] something has disconnected [object MessagePort]", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110751.627058:INFO:CONSOLE(1)] "%s [33m%s [7.468] [SW] it is not a window", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)
+[85634:85634:1008/110751.627071:INFO:CONSOLE(1)] "%s [33m%s [7.468] [SW] cancelling all downloads", source: https://web.telegram.org/k/sw-DXRBlghc.js (1)

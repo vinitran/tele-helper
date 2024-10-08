@@ -2,13 +2,14 @@ package file
 
 import (
 	"bufio"
-	"golang.org/x/text/encoding/charmap"
-	"golang.org/x/text/transform"
 	"io"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/transform"
 )
 
 func ReadLines(fileName string) ([]string, error) {

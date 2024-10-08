@@ -1,8 +1,9 @@
 package test
 
 import (
-	"go-login/utils/file"
 	"testing"
+
+	"go-login/utils/file"
 )
 
 func TestReadFile(t *testing.T) {

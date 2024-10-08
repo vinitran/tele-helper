@@ -2,39 +2,77 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"sync"
+
+	"github.com/urfave/cli/v2"
 	"github.com/xuri/excelize/v2"
 	"go-login/tele"
 	"go-login/utils/file"
-	"log"
-	"sync"
 )
 
 const maxConcurrency = 4
 
 func main() {
-	users, err := file.ReadFileExcel("./data/input.xlsx")
-	if err != nil {
-		log.Fatal(err)
+	app := cli.NewApp()
+	app.Name = "go-tele"
+	flags := []cli.Flag{}
+	app.Commands = []*cli.Command{
+		{
+			Name:    "login",
+			Aliases: []string{},
+			Usage:   "login",
+			Action:  login,
+			Flags:   append(flags),
+		},
+		{
+			Name:    "queryid",
+			Aliases: []string{},
+			Usage:   "get query id",
+			Action:  getQueryId,
+			Flags:   append(flags),
+		},
 	}
 
-	////login
-	//for _, user := range users[1:] {
-	//	teleCli, err := tele.NewClient(
-	//		tele.BlumAppName,
-	//		tele.Config{
-	//			Name:  user[0],
-	//			Proxy: user[1],
-	//		},
-	//	)
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//
-	//	err = teleCli.Login()
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//}
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+}
+
+func login(c *cli.Context) error {
+	users, err := file.ReadFileExcel("./data/input.xlsx")
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users[1:] {
+		teleCli, err := tele.NewClient(
+			tele.BlumAppName,
+			tele.Config{
+				Name:  user[0],
+				Proxy: user[1],
+			},
+		)
+		if err != nil {
+			return err
+		}
+
+		err = teleCli.Login()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func getQueryId(c *cli.Context) error {
+	users, err := file.ReadFileExcel("./data/input.xlsx")
+	if err != nil {
+		return err
+	}
 
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, maxConcurrency)
@@ -60,7 +98,7 @@ func main() {
 				},
 			)
 			if err != nil {
-				log.Fatal(err)
+				return
 			}
 
 			telegramData, err := teleCli.GetDataTele()
@@ -78,4 +116,5 @@ func main() {
 	wg.Wait()
 
 	fmt.Println("All windows opened with max concurrency control.")
+	return nil
 }

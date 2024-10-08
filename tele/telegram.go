@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 	"go-login/utils/file"
-	"log"
-	"time"
 )
 
 const (
@@ -42,7 +43,7 @@ func (c *Client) Login() error {
 
 	opts := []chromedp.ExecAllocatorOption{
 		chromedp.UserDataDir(userDir),
-		//chromedp.Headless,
+		// chromedp.Headless,
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("disable-background-networking", true),
 		chromedp.Flag("enable-logging", true),
@@ -87,7 +88,7 @@ func (c *Client) GetDataTele() (string, error) {
 
 	opts := []chromedp.ExecAllocatorOption{
 		chromedp.UserDataDir(userDir),
-		chromedp.Headless,
+		// chromedp.Headless,
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("disable-background-networking", true),
 		chromedp.Flag("enable-logging", true),
@@ -136,7 +137,7 @@ func (c *Client) GetDataTele() (string, error) {
 		chromedp.Click(startBtn, chromedp.BySearch),
 		chromedp.Sleep(10 * time.Second),
 
-		//runBtn
+		// runBtn
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 			defer cancel()

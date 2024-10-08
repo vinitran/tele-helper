@@ -9,13 +9,32 @@ import (
 	"sync"
 )
 
-const maxConcurrency = 2
+const maxConcurrency = 4
 
 func main() {
 	users, err := file.ReadFileExcel("./data/input.xlsx")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	////login
+	//for _, user := range users[1:] {
+	//	teleCli, err := tele.NewClient(
+	//		tele.BlumAppName,
+	//		tele.Config{
+	//			Name:  user[0],
+	//			Proxy: user[1],
+	//		},
+	//	)
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//
+	//	err = teleCli.Login()
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//}
 
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, maxConcurrency)

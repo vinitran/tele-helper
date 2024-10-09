@@ -12,7 +12,12 @@ import (
 	"go-login/utils/file"
 )
 
-const maxConcurrency = 4
+const maxConcurrency = 2
+
+var NameFlag = &cli.StringFlag{
+	Name:  "name",
+	Usage: "The name of the person to greet",
+}
 
 func main() {
 	app := cli.NewApp()
@@ -24,7 +29,7 @@ func main() {
 			Aliases: []string{},
 			Usage:   "login",
 			Action:  login,
-			Flags:   append(flags),
+			Flags:   append(flags, NameFlag),
 		},
 		{
 			Name:    "queryid",
@@ -43,6 +48,25 @@ func main() {
 }
 
 func login(c *cli.Context) error {
+	if c.String("name") != "" {
+		teleCli, err := tele.NewClient(
+			tele.BlumAppName,
+			tele.Config{
+				Name:  c.String("name"),
+				Proxy: "",
+			},
+		)
+		if err != nil {
+			return err
+		}
+
+		err = teleCli.Login()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	users, err := file.ReadFileExcel("./data/input.xlsx")
 	if err != nil {
 		return err

@@ -70,7 +70,7 @@ func (c *Client) Login() error {
 		chromedp.Navigate(TELEGRAM_URL),
 		chromedp.Sleep(5 * time.Second),
 		chromedp.WaitVisible(`//*[@id="page-chats"]`, chromedp.BySearch),
-		chromedp.Sleep(30 * time.Second),
+		chromedp.Sleep(50 * time.Second),
 	})
 	if err != nil {
 		return err

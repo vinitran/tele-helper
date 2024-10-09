@@ -8,6 +8,7 @@ type AppName string
 
 var BlumAppName AppName = "blum"
 var MajorAppName AppName = "major"
+var TonmarketAppName AppName = "tonmarket"
 
 type Miniapp interface {
 	GetQueryId(input string) (string, error)
@@ -19,6 +20,7 @@ type Miniapp interface {
 type MiniappCfg struct {
 	Url        string
 	UrlQueryId string
+	Name       string
 }
 
 func NewMiniapp(app string) (Miniapp, error) {
@@ -27,6 +29,8 @@ func NewMiniapp(app string) (Miniapp, error) {
 		return NewBlumApp(), nil
 	case MajorAppName:
 		return NewMajorApp(), nil
+	case TonmarketAppName:
+		return NewTonmarketApp(), nil
 	default:
 		return nil, errors.New("app not supported")
 	}

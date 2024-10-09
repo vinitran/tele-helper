@@ -2,25 +2,23 @@ package tele
 
 import (
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 )
 
-type MajorApp struct {
+type TonmarketApp struct {
 	MiniappCfg
 }
 
-func NewMajorApp() *BlumApp {
+func NewTonmarketApp() *BlumApp {
 	return &BlumApp{MiniappCfg{
-		Url:        "https://web.telegram.org/k/#@major",
-		UrlQueryId: "https://major.bot/",
+		Url:        "https://web.telegram.org/k/#@Tomarket_ai_bot",
+		UrlQueryId: "https://mini-app.tomarket.ai/",
 		Name:       string(TonmarketAppName),
 	}}
 }
 
-func (app *MajorApp) GetQueryId(input string) (string, error) {
-	log.Println("asdasd,", input)
+func (app *TonmarketApp) GetQueryId(input string) (string, error) {
 	// Step 1: Extract the part containing tgWebAppData
 	fragmentParts := strings.Split(input, "&")
 	var tgWebAppData string
@@ -43,14 +41,14 @@ func (app *MajorApp) GetQueryId(input string) (string, error) {
 	return decodedData, nil
 }
 
-func (app *MajorApp) GetUrl() string {
+func (app *TonmarketApp) GetUrl() string {
 	return app.Url
 }
 
-func (app *MajorApp) GetUrlQueryId() string {
+func (app *TonmarketApp) GetUrlQueryId() string {
 	return app.UrlQueryId
 }
 
-func (app *MajorApp) NameApp() string {
+func (app *TonmarketApp) NameApp() string {
 	return app.Name
 }

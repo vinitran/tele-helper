@@ -14,6 +14,7 @@ func NewBlumApp() *BlumApp {
 	return &BlumApp{MiniappCfg{
 		Url:        "https://web.telegram.org/k/#@BlumCryptoBot",
 		UrlQueryId: "https://telegram.blum.codes/",
+		Name:       string(BlumAppName),
 	}}
 }
 
@@ -49,5 +50,5 @@ func (app *BlumApp) GetUrlQueryId() string {
 }
 
 func (app *BlumApp) NameApp() string {
-	return string(BlumAppName)
+	return app.Name
 }

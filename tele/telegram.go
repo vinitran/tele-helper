@@ -40,11 +40,12 @@ func NewClient(app *string, cfg Config, fileWrite *excelize.File) (*Client, erro
 			logHelper,
 		}, nil
 	}
-
+	log.Println("app", *app)
 	miniApp, err := NewMiniapp(*app)
 	if err != nil {
 		return nil, logHelper.ErrorMessage(err)
 	}
+	log.Println("aas", miniApp.GetUrl())
 	logHelper = log2.NewLogHelper(cfg.Name, cfg.Proxy, miniApp.NameApp())
 	return &Client{cfg, miniApp, fileWrite, logHelper}, nil
 }
@@ -149,7 +150,7 @@ func (c *Client) GetDataTele() (string, error) {
 
 	err = chromedp.Run(ctx, chromedp.Tasks{
 		chromedp.Navigate(c.GetUrl()),
-		chromedp.Sleep(5 * time.Second),
+		chromedp.Sleep(7 * time.Second),
 		chromedp.WaitVisible(startBtn, chromedp.BySearch),
 		chromedp.Click(startBtn, chromedp.BySearch),
 		chromedp.Sleep(5 * time.Second),

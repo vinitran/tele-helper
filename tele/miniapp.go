@@ -6,12 +6,14 @@ import (
 
 type AppName string
 
-var BlumAppName AppName = "BLUM"
+var BlumAppName AppName = "blum"
+var MajorAppName AppName = "major"
 
 type Miniapp interface {
 	GetQueryId(input string) (string, error)
 	GetUrl() string
 	GetUrlQueryId() string
+	NameApp() string
 }
 
 type MiniappCfg struct {
@@ -19,10 +21,12 @@ type MiniappCfg struct {
 	UrlQueryId string
 }
 
-func NewMiniapp(app AppName) (Miniapp, error) {
-	switch app {
+func NewMiniapp(app string) (Miniapp, error) {
+	switch AppName(app) {
 	case BlumAppName:
 		return NewBlumApp(), nil
+	case MajorAppName:
+		return NewMajorApp(), nil
 	default:
 		return nil, errors.New("app not supported")
 	}

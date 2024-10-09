@@ -2,22 +2,24 @@ package tele
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 	"strings"
 )
 
-type BlumApp struct {
+type MajorApp struct {
 	MiniappCfg
 }
 
-func NewBlumApp() *BlumApp {
+func NewMajorApp() *BlumApp {
 	return &BlumApp{MiniappCfg{
-		Url:        "https://web.telegram.org/k/#@BlumCryptoBot",
-		UrlQueryId: "https://telegram.blum.codes/",
+		Url:        "https://web.telegram.org/k/#@major",
+		UrlQueryId: "https://major.bot/",
 	}}
 }
 
-func (app *BlumApp) GetQueryId(input string) (string, error) {
+func (app *MajorApp) GetQueryId(input string) (string, error) {
+	log.Println("asdasd,", input)
 	// Step 1: Extract the part containing tgWebAppData
 	fragmentParts := strings.Split(input, "&")
 	var tgWebAppData string
@@ -40,14 +42,14 @@ func (app *BlumApp) GetQueryId(input string) (string, error) {
 	return decodedData, nil
 }
 
-func (app *BlumApp) GetUrl() string {
+func (app *MajorApp) GetUrl() string {
 	return app.Url
 }
 
-func (app *BlumApp) GetUrlQueryId() string {
+func (app *MajorApp) GetUrlQueryId() string {
 	return app.UrlQueryId
 }
 
-func (app *BlumApp) NameApp() string {
-	return string(BlumAppName)
+func (app *MajorApp) NameApp() string {
+	return string(MajorAppName)
 }

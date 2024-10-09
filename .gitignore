@@ -1,4 +1,4 @@
 config/*
 !config/example/
 .idea/
-./data/output.xlsx
+data/output.xlsx

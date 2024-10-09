@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"go-login/utils/arr"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/urfave/cli/v2"
@@ -14,10 +16,21 @@ import (
 
 const maxConcurrency = 2
 
-var NameFlag = &cli.StringFlag{
-	Name:  "name",
-	Usage: "The name of the person to greet",
-}
+var (
+	NameFlag = &cli.StringFlag{
+		Name:  "name",
+		Usage: "The name of the person to greet",
+	}
+	MaxConcurencyFlag = &cli.StringFlag{
+		Name:  "threads",
+		Usage: "The number of concurrent threads to use",
+	}
+	AppFlag = &cli.StringFlag{
+		Name:     "app",
+		Usage:    "App name: blum major",
+		Required: true,
+	}
+)
 
 func main() {
 	app := cli.NewApp()
@@ -36,7 +49,7 @@ func main() {
 			Aliases: []string{},
 			Usage:   "get query id",
 			Action:  getQueryId,
-			Flags:   append(flags),
+			Flags:   append(flags, AppFlag, NameFlag, MaxConcurencyFlag),
 		},
 	}
 
@@ -47,38 +60,45 @@ func main() {
 	}
 }
 
-func login(c *cli.Context) error {
-	if c.String("name") != "" {
-		teleCli, err := tele.NewClient(
-			tele.BlumAppName,
-			tele.Config{
-				Name:  c.String("name"),
-				Proxy: "",
-			},
-		)
-		if err != nil {
-			return err
-		}
+func getUsers(c *cli.Context) ([][]string, error) {
+	userInput, err := file.ReadFileExcel("./data/input.xlsx")
+	if err != nil {
+		return nil, err
+	}
+	//remove first row
+	userInput = userInput[1:]
 
-		err = teleCli.Login()
-		if err != nil {
-			return err
-		}
-		return nil
+	specificName := c.String("name")
+	if specificName == "" {
+		return userInput, nil
 	}
 
-	users, err := file.ReadFileExcel("./data/input.xlsx")
+	var users [][]string
+	usernames := strings.Split(specificName, ",")
+	arr.ArrEach(userInput, func(user []string) {
+		arr.ArrEach(usernames, func(s string) {
+			if user[0] == s {
+				users = append(users, user)
+			}
+		})
+	})
+	return users, nil
+}
+
+func login(c *cli.Context) error {
+	users, err := getUsers(c)
 	if err != nil {
 		return err
 	}
 
-	for _, user := range users[1:] {
+	for _, user := range users {
 		teleCli, err := tele.NewClient(
-			tele.BlumAppName,
+			nil,
 			tele.Config{
 				Name:  user[0],
 				Proxy: user[1],
 			},
+			nil,
 		)
 		if err != nil {
 			return err
@@ -93,48 +113,49 @@ func login(c *cli.Context) error {
 }
 
 func getQueryId(c *cli.Context) error {
-	users, err := file.ReadFileExcel("./data/input.xlsx")
+	users, err := getUsers(c)
 	if err != nil {
 		return err
 	}
 
-	var wg sync.WaitGroup
 	sem := make(chan struct{}, maxConcurrency)
+	if c.Int("threads") != 0 {
+		sem = make(chan struct{}, c.Int("threads"))
+	}
+
+	app := c.String("app")
+
+	var wg sync.WaitGroup
 	fileWrite := excelize.NewFile()
 
-	for index, user := range users[1:] {
+	for index, user := range users {
 		if len(user) < 2 {
 			continue
 		}
 		wg.Add(1)
 		go func(i int, nm, prx string, wg *sync.WaitGroup, sem chan struct{}) {
 			defer wg.Done()
-			log.Println("tele account name", nm)
-			// Acquire semaphore to limit concurrency
 			sem <- struct{}{}
-			defer func() { <-sem }() // Release semaphore when done
+			defer func() { <-sem }()
 
 			teleCli, err := tele.NewClient(
-				tele.BlumAppName,
+				&app,
 				tele.Config{
 					Name:  nm,
 					Proxy: prx,
 				},
+				fileWrite,
 			)
 			if err != nil {
+				log.Println(err)
 				return
 			}
 
-			telegramData, err := teleCli.GetDataTele()
+			err = teleCli.ExportQueryId(i + 1)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
+				return
 			}
-
-			err = file.ExportDataToExel(fileWrite, i+1, nm, prx, telegramData)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println("Telegram data:", telegramData)
 		}(index, user[0], user[1], &wg, sem)
 	}
 	wg.Wait()

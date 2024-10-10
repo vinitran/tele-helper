@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"go-login/utils/arr"
 	"log"
 	"os"
 	"strings"
 	"sync"
+
+	"go-login/utils/arr"
 
 	"github.com/urfave/cli/v2"
 	"github.com/xuri/excelize/v2"
@@ -65,7 +66,7 @@ func getUsers(c *cli.Context) ([][]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	//remove first row
+	// remove first row
 	userInput = userInput[1:]
 
 	specificName := c.String("name")

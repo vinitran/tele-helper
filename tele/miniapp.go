@@ -6,9 +6,11 @@ import (
 
 type AppName string
 
-var BlumAppName AppName = "blum"
-var MajorAppName AppName = "major"
-var TonmarketAppName AppName = "tonmarket"
+var (
+	BlumAppName      AppName = "blum"
+	MajorAppName     AppName = "major"
+	TonmarketAppName AppName = "tonmarket"
+)
 
 type Miniapp interface {
 	GetQueryId(input string) (string, error)

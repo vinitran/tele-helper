@@ -53,7 +53,7 @@ func (lh *LogHelper) ErrorMessage(err error) error {
 	if lh.App == "" {
 		return fmt.Errorf("[ID: %s _ IP: %s ] %s\n", lh.UserID, lh.IP, color.RedString(fmt.Sprintf("%e", err)))
 	}
-	return fmt.Errorf("[ID: %s _ IP: %s _ MiniApp: %s ] %s\n", lh.UserID, lh.IP, lh.App, color.RedString(fmt.Sprintf("%e", err)))
+	return fmt.Errorf("[ID: %s _ IP: %s _ MiniApp: %s ] %s\n", lh.UserID, lh.IP, lh.App, color.RedString(err.Error()))
 }
 
 func (lh *LogHelper) ErrorWithMsg(msg string) error {

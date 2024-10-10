@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/xuri/excelize/v2"
-	log2 "go-login/utils/log"
 	"log"
 	"time"
+
+	"github.com/xuri/excelize/v2"
+	log2 "go-login/utils/log"
 
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
@@ -40,12 +41,11 @@ func NewClient(app *string, cfg Config, fileWrite *excelize.File) (*Client, erro
 			logHelper,
 		}, nil
 	}
-	log.Println("app", *app)
 	miniApp, err := NewMiniapp(*app)
 	if err != nil {
 		return nil, logHelper.ErrorMessage(err)
 	}
-	log.Println("aas", miniApp.GetUrl())
+
 	logHelper = log2.NewLogHelper(cfg.Name, cfg.Proxy, miniApp.NameApp())
 	return &Client{cfg, miniApp, fileWrite, logHelper}, nil
 }
@@ -141,6 +141,7 @@ func (c *Client) GetDataTele() (string, error) {
 				if err != nil {
 					log.Println(c.log.ErrorMessage(err))
 				}
+				log.Println("data", telegramData)
 			}
 		}
 	})

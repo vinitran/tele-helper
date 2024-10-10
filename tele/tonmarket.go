@@ -2,7 +2,6 @@ package tele
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 )
 
@@ -10,8 +9,8 @@ type TonmarketApp struct {
 	MiniappCfg
 }
 
-func NewTonmarketApp() *BlumApp {
-	return &BlumApp{MiniappCfg{
+func NewTonmarketApp() *TonmarketApp {
+	return &TonmarketApp{MiniappCfg{
 		Url:        "https://web.telegram.org/k/#@Tomarket_ai_bot",
 		UrlQueryId: "https://mini-app.tomarket.ai/",
 		Name:       string(TonmarketAppName),
@@ -19,26 +18,20 @@ func NewTonmarketApp() *BlumApp {
 }
 
 func (app *TonmarketApp) GetQueryId(input string) (string, error) {
-	// Step 1: Extract the part containing tgWebAppData
-	fragmentParts := strings.Split(input, "&")
-	var tgWebAppData string
-	for _, part := range fragmentParts {
-		if strings.HasPrefix(part, "#tgWebAppData=") {
-			tgWebAppData = strings.TrimPrefix(part, "#tgWebAppData=")
-			break
-		}
+	queryIDStart := strings.Index(input, "query_id")
+	if queryIDStart == -1 {
+		return "", fmt.Errorf("query_id not found")
 	}
 
-	if tgWebAppData == "" {
-		return "", fmt.Errorf("no tgWebAppData found")
+	// Find the next '&' character after the query_id to determine where it ends
+	queryIDEnd := strings.Index(input[queryIDStart:], "&")
+	if queryIDEnd == -1 {
+		// If there's no '&' after query_id, take the rest of the string
+		return input[queryIDStart:], nil
 	}
 
-	decodedData, err := url.QueryUnescape(tgWebAppData)
-	if err != nil {
-		return "", fmt.Errorf("error decoding tgWebAppData: %v", err)
-	}
-
-	return decodedData, nil
+	// Extract the query_id segment
+	return input[queryIDStart : queryIDStart+queryIDEnd], nil
 }
 
 func (app *TonmarketApp) GetUrl() string {

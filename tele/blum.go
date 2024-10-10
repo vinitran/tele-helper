@@ -19,7 +19,6 @@ func NewBlumApp() *BlumApp {
 }
 
 func (app *BlumApp) GetQueryId(input string) (string, error) {
-	// Step 1: Extract the part containing tgWebAppData
 	fragmentParts := strings.Split(input, "&")
 	var tgWebAppData string
 	for _, part := range fragmentParts {

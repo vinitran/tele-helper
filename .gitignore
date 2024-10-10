@@ -2,3 +2,5 @@ config/*
 !config/extensions/
 .idea/
 data/output.xlsx
+data/*.zip
+data/usersData

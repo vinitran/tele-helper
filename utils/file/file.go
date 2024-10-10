@@ -79,11 +79,11 @@ func CopyFolder(src, dst string) error {
 			return os.MkdirAll(dstPath, info.Mode())
 		}
 
-		return copyFile(path, dstPath)
+		return CopyFile(path, dstPath)
 	})
 }
 
-func copyFile(src, dst string) error {
+func CopyFile(src, dst string) error {
 	srcFile, err := os.Open(src)
 	if err != nil {
 		return err

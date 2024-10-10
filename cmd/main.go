@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go-login/exporter"
 	"log"
 	"os"
 	"strings"
@@ -51,6 +52,20 @@ func main() {
 			Usage:   "get query id",
 			Action:  getQueryId,
 			Flags:   append(flags, AppFlag, NameFlag, MaxConcurencyFlag),
+		},
+		{
+			Name:    "export",
+			Aliases: []string{},
+			Usage:   "export to zip user data",
+			Action:  exportUserData,
+			Flags:   append(flags, NameFlag),
+		},
+		{
+			Name:    "import",
+			Aliases: []string{},
+			Usage:   "import from zip user data",
+			Action:  importUserData,
+			Flags:   append(flags),
 		},
 	}
 
@@ -162,5 +177,48 @@ func getQueryId(c *cli.Context) error {
 	wg.Wait()
 
 	fmt.Println("All windows opened with max concurrency control.")
+	return nil
+}
+
+func exportUserData(c *cli.Context) error {
+	users, err := getUsers(c)
+	if err != nil {
+		return err
+	}
+	var userProfiles []string
+
+	arr.ArrEach(users, func(user []string) {
+		userProfiles = append(userProfiles, fmt.Sprintf("./config/chrome/%s", user[0]))
+	})
+
+	backupFolder := "./data/usersData"
+
+	// Step 1: Copy all user profiles to the backup folder
+	err = exporter.SaveAllUserProfilesToFolder(userProfiles, backupFolder)
+	if err != nil {
+		return fmt.Errorf("failed to copy user profiles: %v", err)
+	}
+
+	// Step 2: Zip the entire backup folder
+	destinationZip := "./data/usersDataExport.zip"
+	err = exporter.ZipFolder(backupFolder, destinationZip)
+	if err != nil {
+		return fmt.Errorf("failed to zip the backup folder: %v", err)
+	}
+
+	log.Println("All user profiles successfully saved and zipped.")
+	return nil
+}
+
+func importUserData(c *cli.Context) error {
+	zipFilePath := "./data/"              // Path to your zip file
+	chromeProfileDir := "./config/chrome" // Path to Chrome's profile directory
+
+	// Import user profiles from the zip file
+	err := exporter.ImportUserProfilesFromZip(zipFilePath, chromeProfileDir)
+	if err != nil {
+		return fmt.Errorf("Failed to import user profiles: %v", err)
+	}
+
 	return nil
 }

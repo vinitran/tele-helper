@@ -3,7 +3,6 @@ package tele
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
@@ -16,7 +15,7 @@ import (
 )
 
 const (
-	SRC_USER_DIR = "./config/example"
+	SRC_USER_DIR = "./config/chrome"
 	TELEGRAM_URL = "https://web.telegram.org/"
 )
 
@@ -52,18 +51,19 @@ func NewClient(app *string, cfg Config, fileWrite *excelize.File) (*Client, erro
 
 func (c *Client) Login() error {
 	c.log.Success("start login")
-	userDir := fmt.Sprintf("./config/%s", c.Name)
-
 	extensionPath := "config/extensions/gleekbfjekiniecknbkamfmkohkpodhe"
+
 	opts := []chromedp.ExecAllocatorOption{
 		chromedp.Flag("load-extension", extensionPath),
-		chromedp.UserDataDir(userDir),
+		chromedp.UserDataDir(SRC_USER_DIR),
+		chromedp.Flag("profile-directory", c.Name),
 		// chromedp.Headless,
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("disable-background-networking", true),
 		chromedp.Flag("enable-logging", true),
 		chromedp.WindowSize(560, 1080),
 		chromedp.NoFirstRun,
+		chromedp.NoDefaultBrowserCheck,
 	}
 
 	//if c.useProxy() {
@@ -96,20 +96,19 @@ func (c *Client) Login() error {
 
 func (c *Client) GetDataTele() (string, error) {
 	c.log.Success("start get query_id")
-	userDir := fmt.Sprintf("./config/%s", c.Name)
-	err := file.CheckExistAndCopy(userDir, SRC_USER_DIR)
-	if err != nil {
-		return "", c.log.ErrorMessage(err)
-	}
 
+	extensionPath := "config/extensions/gleekbfjekiniecknbkamfmkohkpodhe"
 	opts := []chromedp.ExecAllocatorOption{
-		chromedp.UserDataDir(userDir),
+		chromedp.Flag("load-extension", extensionPath),
+		chromedp.UserDataDir(SRC_USER_DIR),
+		chromedp.Flag("profile-directory", c.Name),
 		// chromedp.Headless,
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("disable-background-networking", true),
 		chromedp.Flag("enable-logging", true),
 		chromedp.WindowSize(480, 1080),
 		chromedp.NoDefaultBrowserCheck,
+		chromedp.NoFirstRun,
 	}
 
 	if c.useProxy() {
@@ -122,7 +121,7 @@ func (c *Client) GetDataTele() (string, error) {
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
 
-	err = chromedp.Run(ctx, network.Enable())
+	err := chromedp.Run(ctx, network.Enable())
 	if err != nil {
 		return "", c.log.ErrorMessage(err)
 	}

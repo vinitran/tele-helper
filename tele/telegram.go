@@ -53,24 +53,22 @@ func NewClient(app *string, cfg Config, fileWrite *excelize.File) (*Client, erro
 func (c *Client) Login() error {
 	c.log.Success("start login")
 	userDir := fmt.Sprintf("./config/%s", c.Name)
-	err := file.CheckExistAndCopy(userDir, SRC_USER_DIR)
-	if err != nil {
-		return c.log.ErrorMessage(err)
-	}
 
+	extensionPath := "config/extensions/gleekbfjekiniecknbkamfmkohkpodhe"
 	opts := []chromedp.ExecAllocatorOption{
+		chromedp.Flag("load-extension", extensionPath),
 		chromedp.UserDataDir(userDir),
 		// chromedp.Headless,
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("disable-background-networking", true),
 		chromedp.Flag("enable-logging", true),
 		chromedp.WindowSize(560, 1080),
-		chromedp.ProxyServer(c.Proxy),
+		chromedp.NoFirstRun,
 	}
 
-	if c.useProxy() {
-		opts = append(opts, chromedp.ProxyServer(c.Proxy))
-	}
+	//if c.useProxy() {
+	//	opts = append(opts, chromedp.ProxyServer(c.Proxy))
+	//}
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
 	defer cancel()
@@ -78,11 +76,11 @@ func (c *Client) Login() error {
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
 
-	err = chromedp.Run(ctx, network.Enable())
+	err := chromedp.Run(ctx, network.Enable())
 	if err != nil {
 		return c.log.ErrorMessage(err)
 	}
-
+	log.Println("asdasd")
 	err = chromedp.Run(ctx, chromedp.Tasks{
 		chromedp.Navigate(TELEGRAM_URL),
 		chromedp.WaitVisible(`//*[@id="LeftColumn-main"]`, chromedp.BySearch),
@@ -111,7 +109,7 @@ func (c *Client) GetDataTele() (string, error) {
 		chromedp.Flag("disable-background-networking", true),
 		chromedp.Flag("enable-logging", true),
 		chromedp.WindowSize(480, 1080),
-		chromedp.ProxyServer(c.Proxy),
+		chromedp.NoDefaultBrowserCheck,
 	}
 
 	if c.useProxy() {
@@ -141,7 +139,6 @@ func (c *Client) GetDataTele() (string, error) {
 				if err != nil {
 					log.Println(c.log.ErrorMessage(err))
 				}
-				log.Println("data", telegramData)
 			}
 		}
 	})

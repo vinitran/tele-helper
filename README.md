@@ -11,7 +11,7 @@ This project is a tool that automates logging into Telegram and retrieving `quer
 
 ## Prerequisites
 
-- Go 1.19+ installed on your system.
+- Go 1.23+ installed on your system.
 - Telegram account credentials.
 - `chromedp` package installed (`go get -u github.com/chromedp/chromedp`).
 
@@ -20,8 +20,8 @@ This project is a tool that automates logging into Telegram and retrieving `quer
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/telegram-tool-chromedp.git
-cd telegram-tool-chromedp
+git https://github.com/vinitran/tele-helper.git
+cd tele-helper
 ```
 
 Install dependencies:

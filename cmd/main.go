@@ -195,6 +195,7 @@ func exportUserData(c *cli.Context) error {
 		if err != nil {
 			return err
 		}
+		log.Printf("exported user: %s\n", user[0])
 		return nil
 	})
 
@@ -249,5 +250,4 @@ func importUserData(c *cli.Context) error {
 	}
 
 	return file.DeleteFolder(zipExtract)
-
 }

@@ -1,6 +1,6 @@
 config/*
+!config/profiles/example/
 !config/extensions/
 .idea/
 data/output.xlsx
 data/*.zip
-data/usersData

@@ -3,6 +3,7 @@ package tele
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -15,7 +16,7 @@ import (
 )
 
 const (
-	SRC_USER_DIR = "./config/chrome"
+	SRC_USER_DIR = "./config/profiles/%s"
 	TELEGRAM_URL = "https://web.telegram.org/"
 )
 
@@ -55,8 +56,7 @@ func (c *Client) Login() error {
 
 	opts := []chromedp.ExecAllocatorOption{
 		chromedp.Flag("load-extension", extensionPath),
-		chromedp.UserDataDir(SRC_USER_DIR),
-		chromedp.Flag("profile-directory", c.Name),
+		chromedp.UserDataDir(fmt.Sprintf(SRC_USER_DIR, c.Name)),
 		// chromedp.Headless,
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("disable-background-networking", true),
@@ -84,7 +84,7 @@ func (c *Client) Login() error {
 	err = chromedp.Run(ctx, chromedp.Tasks{
 		chromedp.Navigate(TELEGRAM_URL),
 		chromedp.WaitVisible(`//*[@id="LeftColumn-main"]`, chromedp.BySearch),
-		chromedp.Sleep(3 * time.Second),
+		chromedp.Sleep(20 * time.Second),
 	})
 	if err != nil {
 		return c.log.ErrorMessage(err)
@@ -94,28 +94,27 @@ func (c *Client) Login() error {
 	return nil
 }
 
-func (c *Client) GetDataTele() (string, error) {
+func (c *Client) GetDataTele(ctxCli context.Context) (string, error) {
 	c.log.Success("start get query_id")
 
 	extensionPath := "config/extensions/gleekbfjekiniecknbkamfmkohkpodhe"
 	opts := []chromedp.ExecAllocatorOption{
 		chromedp.Flag("load-extension", extensionPath),
-		chromedp.UserDataDir(SRC_USER_DIR),
-		chromedp.Flag("profile-directory", c.Name),
+		chromedp.UserDataDir(fmt.Sprintf(SRC_USER_DIR, c.Name)),
 		// chromedp.Headless,
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("disable-background-networking", true),
 		chromedp.Flag("enable-logging", true),
 		chromedp.WindowSize(480, 1080),
-		chromedp.NoDefaultBrowserCheck,
 		chromedp.NoFirstRun,
+		chromedp.NoDefaultBrowserCheck,
 	}
 
 	if c.useProxy() {
 		opts = append(opts, chromedp.ProxyServer(c.Proxy))
 	}
 
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	allocCtx, cancel := chromedp.NewExecAllocator(ctxCli, opts...)
 	defer cancel()
 
 	ctx, cancel := chromedp.NewContext(allocCtx)
@@ -185,8 +184,8 @@ func (c *Client) GetDataTele() (string, error) {
 	return telegramData, nil
 }
 
-func (c *Client) ExportQueryId(row int) error {
-	telegramData, err := c.GetDataTele()
+func (c *Client) ExportQueryId(ctx context.Context, row int) error {
+	telegramData, err := c.GetDataTele(ctx)
 	if err != nil {
 		return err
 	}

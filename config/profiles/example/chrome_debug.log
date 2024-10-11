@@ -1,0 +1,26 @@
+[180784:180784:1011/103048.954204:WARNING:chrome_main_delegate.cc(742)] This is Chrome version 126.0.6478.182 (not a warning)
+[180784:180784:1011/103049.146116:INFO:chrome_browser_cloud_management_controller.cc(196)] No machine level policy manager exists.
+[180784:180864:1011/103049.192277:WARNING:external_pref_loader.cc(294)] You are using an old-style extension deployment method (external_extensions.json), which will soon be deprecated. (see http://developer.chrome.com/docs/extensions/how-to/distribute/install-extensions)
+[180825:180825:1011/103049.213708:WARNING:sandbox_linux.cc(430)] InitializeSandbox() called with multiple threads in process gpu-process.
+[180784:180784:1011/103049.297162:WARNING:browser_management_service.cc(128)] EnterpriseLogoUrl fetch failed with error code -1 and MIME type 
+[180784:180784:1011/103049.314436:WARNING:bluez_dbus_manager.cc(248)] Floss manager not present, cannot set Floss enable/disable.
+[180784:180784:1011/103049.458419:ERROR:object_proxy.cc(576)] Failed to call method: org.freedesktop.ScreenSaver.GetActive: object_path= /org/freedesktop/ScreenSaver: org.freedesktop.DBus.Error.NotSupported: This method is not implemented
+[180902:1:1011/103053.550564:INFO:document_style_environment_variables.cc(104)] E2E_Used SafeAreaInsetBottom
+[180902:1:1011/103053.635152:INFO:document_style_environment_variables.cc(104)] E2E_Used SafeAreaInsetBottom
+[180902:1:1011/103053.650276:INFO:document_style_environment_variables.cc(104)] E2E_Used SafeAreaInsetBottom
+[180902:1:1011/103053.687450:INFO:document_style_environment_variables.cc(104)] E2E_Used SafeAreaInsetBottom
+[180902:1:1011/103053.721562:INFO:document_style_environment_variables.cc(104)] E2E_Used SafeAreaInsetBottom
+[180902:1:1011/103054.197688:INFO:document_style_environment_variables.cc(104)] E2E_Used SafeAreaInsetBottom
+[180784:180784:1011/103059.603211:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:5157
+[180784:180784:1011/103059.755703:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:265059
+[180784:180784:1011/103059.964945:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:883094
+[180784:180784:1011/103100.490401:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:45164
+[180902:1:1011/103101.173563:INFO:document_style_environment_variables.cc(104)] E2E_Used SafeAreaInsetBottom
+[180784:180784:1011/103101.247329:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:2747168
+[180902:1:1011/103101.323984:INFO:document_style_environment_variables.cc(104)] E2E_Used SafeAreaInsetBottom
+[180902:1:1011/103101.340351:INFO:document_style_environment_variables.cc(104)] E2E_Used SafeAreaInsetBottom
+[180784:180784:1011/103101.869878:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:2200227
+[180784:180784:1011/103102.091756:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:3844
+[180784:180784:1011/103102.473194:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:1463571
+[180784:180784:1011/103103.009345:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:4680
+[180784:180784:1011/103105.143874:WARNING:controller_impl.cc(1192)] Background download complete, client: 6, completion type: 0, file size:118577

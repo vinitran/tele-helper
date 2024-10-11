@@ -1,8 +1,8 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"go-login/exporter"
 	"log"
 	"os"
 	"strings"
@@ -167,7 +167,7 @@ func getQueryId(c *cli.Context) error {
 				return
 			}
 
-			err = teleCli.ExportQueryId(i + 1)
+			err = teleCli.ExportQueryId(context.Background(), i+1)
 			if err != nil {
 				log.Println(err)
 				return
@@ -185,40 +185,69 @@ func exportUserData(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	var userProfiles []string
 
-	arr.ArrEach(users, func(user []string) {
-		userProfiles = append(userProfiles, fmt.Sprintf("./config/chrome/%s", user[0]))
+	backupFolderRoot := "./data/usersData"
+
+	arr.ArrEachWithErr(users, func(user []string) error {
+		userProfile := fmt.Sprintf("./config/profiles/%s/Default", user[0])
+		backupFolder := fmt.Sprintf("%s/%s", backupFolderRoot, user[0])
+		err := file.CopyFolder(userProfile, backupFolder)
+		if err != nil {
+			return err
+		}
+		return nil
 	})
 
-	backupFolder := "./data/usersData"
+	destinationZip := "./data/profiles.zip"
 
-	// Step 1: Copy all user profiles to the backup folder
-	err = exporter.SaveAllUserProfilesToFolder(userProfiles, backupFolder)
+	err = file.ZipFolder(backupFolderRoot, destinationZip)
 	if err != nil {
-		return fmt.Errorf("failed to copy user profiles: %v", err)
-	}
-
-	// Step 2: Zip the entire backup folder
-	destinationZip := "./data/usersDataExport.zip"
-	err = exporter.ZipFolder(backupFolder, destinationZip)
-	if err != nil {
-		return fmt.Errorf("failed to zip the backup folder: %v", err)
+		return err
 	}
 
 	log.Println("All user profiles successfully saved and zipped.")
-	return nil
+
+	return file.DeleteFolder(backupFolderRoot)
 }
 
 func importUserData(c *cli.Context) error {
-	zipFilePath := "./data/"              // Path to your zip file
-	chromeProfileDir := "./config/chrome" // Path to Chrome's profile directory
+	zipFilePath := "./data/" // Path to your zip file
+	zipExtract := fmt.Sprintf("%s%s", zipFilePath, "zip_extract")
+	chromeProfileDir := "./config/profiles" // Path to Chrome's profile directory
 
-	// Import user profiles from the zip file
-	err := exporter.ImportUserProfilesFromZip(zipFilePath, chromeProfileDir)
+	err := file.UnzipAllFilesInFolder(zipFilePath, zipExtract)
 	if err != nil {
-		return fmt.Errorf("Failed to import user profiles: %v", err)
+		return err
 	}
 
-	return nil
+	users, err := file.GetFoldersInFolder(zipExtract)
+	if err != nil {
+		return err
+	}
+
+	err = arr.ArrEachWithErr(users, func(user string) error {
+		userProfileImport := fmt.Sprintf("%s/%s", zipExtract, user)
+		err := file.CopyFolder(
+			fmt.Sprintf("%s/example", chromeProfileDir),
+			fmt.Sprintf("%s/%s", chromeProfileDir, user),
+		)
+		if err != nil {
+			return err
+		}
+
+		userPath := fmt.Sprintf("%s/%s/Default", chromeProfileDir, user)
+		err = file.CopyFolder(userProfileImport, userPath)
+		if err != nil {
+			return err
+		}
+		log.Printf("imported user: %s\n", user)
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return file.DeleteFolder(zipExtract)
+
 }

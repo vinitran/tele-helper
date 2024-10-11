@@ -66,9 +66,9 @@ func (c *Client) Login() error {
 		chromedp.NoDefaultBrowserCheck,
 	}
 
-	//if c.useProxy() {
-	//	opts = append(opts, chromedp.ProxyServer(c.Proxy))
-	//}
+	if c.useProxy() {
+		opts = append(opts, chromedp.ProxyServer(c.Proxy))
+	}
 
 	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
 	defer cancel()
@@ -76,11 +76,14 @@ func (c *Client) Login() error {
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
 
+	ctx, cancel = context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+
 	err := chromedp.Run(ctx, network.Enable())
 	if err != nil {
 		return c.log.ErrorMessage(err)
 	}
-	log.Println("asdasd")
+
 	err = chromedp.Run(ctx, chromedp.Tasks{
 		chromedp.Navigate(TELEGRAM_URL),
 		chromedp.WaitVisible(`//*[@id="LeftColumn-main"]`, chromedp.BySearch),
@@ -118,6 +121,9 @@ func (c *Client) GetDataTele(ctxCli context.Context) (string, error) {
 	defer cancel()
 
 	ctx, cancel := chromedp.NewContext(allocCtx)
+	defer cancel()
+
+	ctx, cancel = context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 
 	err := chromedp.Run(ctx, network.Enable())

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"strings"
 	"time"
 
 	"github.com/xuri/excelize/v2"
@@ -52,20 +52,8 @@ func NewClient(app *string, cfg Config, fileWrite *excelize.File) (*Client, erro
 
 func (c *Client) Login() error {
 	c.log.Success("start login")
-	extensionPath := "config/extensions/gleekbfjekiniecknbkamfmkohkpodhe"
 
-	opts := []chromedp.ExecAllocatorOption{
-		chromedp.Flag("load-extension", extensionPath),
-		chromedp.UserDataDir(fmt.Sprintf(SRC_USER_DIR, c.Name)),
-		// chromedp.Headless,
-		chromedp.Flag("disable-gpu", true),
-		chromedp.Flag("disable-background-networking", true),
-		chromedp.Flag("enable-logging", true),
-		chromedp.WindowSize(560, 1080),
-		chromedp.NoFirstRun,
-		chromedp.NoDefaultBrowserCheck,
-	}
-
+	opts := c.defaultOpt()
 	if c.useProxy() {
 		opts = append(opts, chromedp.ProxyServer(c.Proxy))
 	}
@@ -100,19 +88,7 @@ func (c *Client) Login() error {
 func (c *Client) GetDataTele(ctxCli context.Context) (string, error) {
 	c.log.Success("start get query_id")
 
-	extensionPath := "config/extensions/gleekbfjekiniecknbkamfmkohkpodhe"
-	opts := []chromedp.ExecAllocatorOption{
-		chromedp.Flag("load-extension", extensionPath),
-		chromedp.UserDataDir(fmt.Sprintf(SRC_USER_DIR, c.Name)),
-		// chromedp.Headless,
-		chromedp.Flag("disable-gpu", true),
-		chromedp.Flag("disable-background-networking", true),
-		chromedp.Flag("enable-logging", true),
-		chromedp.WindowSize(480, 1080),
-		chromedp.NoFirstRun,
-		chromedp.NoDefaultBrowserCheck,
-	}
-
+	opts := c.defaultOpt()
 	if c.useProxy() {
 		opts = append(opts, chromedp.ProxyServer(c.Proxy))
 	}
@@ -126,68 +102,27 @@ func (c *Client) GetDataTele(ctxCli context.Context) (string, error) {
 	ctx, cancel = context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 
-	err := chromedp.Run(ctx, network.Enable())
-	if err != nil {
-		return "", c.log.ErrorMessage(err)
-	}
+	launchBtn := "/html/body/div[6]/div/div[2]/button[1]"
+	var iframeSrc string
 
-	var telegramData string
-	chromedp.Run(ctx,
-		network.Enable(),
-	)
-
-	chromedp.ListenTarget(ctx, func(ev interface{}) {
-		if eventRequest, ok := ev.(*network.EventRequestWillBeSent); ok {
-			if eventRequest.Request.URL == c.GetUrlQueryId() {
-				telegramData, err = c.GetQueryId(eventRequest.Request.URLFragment)
-				if err != nil {
-					log.Println(c.log.ErrorMessage(err))
-				}
-			}
-		}
-	})
-
-	startBtn := `/html/body/div[1]/div/div[2]/div/div[1]/div[4]/div/div[1]/div/div[8]/div[1]/div[2]`
-	runBtn := "/html/body/div[6]/div/div[2]/button[1]"
-
-	err = chromedp.Run(ctx, chromedp.Tasks{
+	err := chromedp.Run(ctx, chromedp.Tasks{
 		chromedp.Navigate(c.GetUrl()),
-		chromedp.Sleep(7 * time.Second),
-		chromedp.WaitVisible(startBtn, chromedp.BySearch),
-		chromedp.Click(startBtn, chromedp.BySearch),
-		chromedp.Sleep(5 * time.Second),
-
-		// runBtn
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			timeoutCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
-			defer cancel()
-
-			if err := chromedp.Run(timeoutCtx, chromedp.WaitVisible(runBtn, chromedp.BySearch)); err != nil {
-				return err
-			}
-
-			err = chromedp.Run(
-				timeoutCtx,
-				chromedp.Sleep(2*time.Second),
-				chromedp.Click(runBtn, chromedp.BySearch),
-				chromedp.Sleep(12*time.Second),
-			)
-			if err != nil {
-				return err
-			}
-			return nil
-		}),
+		chromedp.WaitVisible(launchBtn, chromedp.BySearch),
+		chromedp.Click(launchBtn, chromedp.BySearch),
+		chromedp.WaitVisible(`iframe.payment-verification`, chromedp.ByQuery),
+		chromedp.AttributeValue(`iframe.payment-verification`, "src", &iframeSrc, nil),
 	})
 	if err != nil && !errors.Is(err, context.DeadlineExceeded) {
 		return "", c.log.ErrorMessage(err)
 	}
 
-	if telegramData == "" {
-		return "", c.log.ErrorWithMsg("can not get query_id")
+	queryId, err := extractTgWebAppData(iframeSrc)
+	if err != nil {
+		return "", err
 	}
 
 	c.log.Success("get query_id successfully")
-	return telegramData, nil
+	return queryId, nil
 }
 
 func (c *Client) ExportQueryId(ctx context.Context, row int) error {
@@ -203,4 +138,38 @@ func (c *Client) ExportQueryId(ctx context.Context, row int) error {
 
 	c.log.Success("export query_id to excel file successfully")
 	return nil
+}
+
+func extractTgWebAppData(src string) (string, error) {
+	parts := strings.Split(src, "#")
+	if len(parts) < 2 {
+		return "", fmt.Errorf("no fragment found in the URL")
+	}
+
+	fragment := parts[1]
+	fragmentParams := strings.Split(fragment, "&")
+
+	for _, param := range fragmentParams {
+		kv := strings.SplitN(param, "=", 2)
+		if len(kv) == 2 && kv[0] == "tgWebAppData" {
+			return kv[1], nil
+		}
+	}
+
+	return "", fmt.Errorf("tgWebAppData not found in URL fragment")
+}
+
+func (c *Client) defaultOpt() []chromedp.ExecAllocatorOption {
+	extensionPath := "config/extensions/gleekbfjekiniecknbkamfmkohkpodhe"
+	return []chromedp.ExecAllocatorOption{
+		chromedp.Flag("load-extension", extensionPath),
+		chromedp.UserDataDir(fmt.Sprintf(SRC_USER_DIR, c.Name)),
+		// chromedp.Headless,
+		chromedp.Flag("disable-gpu", true),
+		chromedp.Flag("disable-background-networking", true),
+		chromedp.Flag("enable-logging", true),
+		chromedp.WindowSize(560, 1080),
+		chromedp.NoFirstRun,
+		chromedp.NoDefaultBrowserCheck,
+	}
 }

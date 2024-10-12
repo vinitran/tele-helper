@@ -13,16 +13,13 @@ var (
 )
 
 type Miniapp interface {
-	GetQueryId(input string) (string, error)
 	GetUrl() string
-	GetUrlQueryId() string
 	NameApp() string
 }
 
 type MiniappCfg struct {
-	Url        string
-	UrlQueryId string
-	Name       string
+	Url  string
+	Name string
 }
 
 func NewMiniapp(app string) (Miniapp, error) {
